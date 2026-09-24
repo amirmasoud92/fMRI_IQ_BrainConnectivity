@@ -1,0 +1,189 @@
+project:
+  name: AOMIC-ID1000-VAEGAT
+  description: VAE-GAT analysis of movie-watching fMRI functional connectivity
+  seed: 42
+paths:
+  bids_root: .
+  fmriprep_dir: derivatives/fmriprep
+  output_dir: outputs/v4_64_fb001
+  connectivity_dir: outputs/connectivity
+  models_dir: outputs/models_v4_64_fb001
+  figures_dir: outputs/figures
+  piop1_root: PIOP1                     # AOMIC-PIOP1 root
+  piop2_root: ../PIOP2                  # AOMIC-PIOP2 root
+  external_derivatives_dir: ../derivatives   # FreeSurfer, diffusion and MRIQC derivatives
+dataset:
+  name: ID1000
+  task: moviewatching
+  space: MNI152NLin2009cAsym
+  n_subjects_max: null
+  tr: 2.2                   # repetition time in seconds (verified against BIDS sidecars)
+atlas:
+  name: schaefer200
+  n_rois: 200
+  resolution_mm: 2
+preprocessing:
+  fd_threshold: 0.5
+  min_volumes_after_scrub: 100
+  confound_strategy: 36p
+  confounds:
+  - trans_x
+  - trans_x_derivative1
+  - trans_x_power2
+  - trans_x_derivative1_power2
+  - trans_y
+  - trans_y_derivative1
+  - trans_y_power2
+  - trans_y_derivative1_power2
+  - trans_z
+  - trans_z_derivative1
+  - trans_z_power2
+  - trans_z_derivative1_power2
+  - rot_x
+  - rot_x_derivative1
+  - rot_x_power2
+  - rot_x_derivative1_power2
+  - rot_y
+  - rot_y_derivative1
+  - rot_y_power2
+  - rot_y_derivative1_power2
+  - rot_z
+  - rot_z_derivative1
+  - rot_z_power2
+  - rot_z_derivative1_power2
+  - csf
+  - csf_derivative1
+  - csf_power2
+  - csf_derivative1_power2
+  - white_matter
+  - white_matter_derivative1
+  - white_matter_power2
+  - white_matter_derivative1_power2
+  - global_signal
+  - global_signal_derivative1
+  - global_signal_power2
+  - global_signal_derivative1_power2
+  high_pass: 0.01
+  low_pass: 0.1
+  smoothing_fwhm: 6.0
+graph:
+  threshold_method: proportional
+  density: 0.2
+  self_loops: false
+  node_feature: fc_profile
+  edge_weight: absolute_pearson
+  use_coords: true
+dynamic_fc:
+  enabled: false
+  window_size_s: 60
+  stride_s: 20
+  n_windows: 15
+resting_state:
+  enabled: false
+  task: restingstate
+model:
+  name: BrainVAEGAT
+  n_rois: 200
+  node_feat_dim: 203
+  hidden_dims:
+  - 256
+  - 256
+  - 128
+  latent_dim: 64
+  n_heads: 8
+  decoder_type: graph_transformer
+  decoder_hidden: 256
+  gt_decoder_layers: 2
+  dropout: 0.1
+  edge_dropout: 0.05
+  batch_norm: true
+  residual: true
+  use_dynamic: false
+  temporal_hidden: 128
+  temporal_layers: 2
+  use_rest_fusion: false
+training:
+  n_epochs: 300
+  batch_size: 32
+  learning_rate: 0.0003
+  weight_decay: 1.0e-05
+  beta_start: 0.0
+  beta_end: 1.0
+  beta_warmup_epochs: 50
+  free_bits: 0.01
+  pheno_weight: 0.05
+  lr_scheduler: cosine
+  patience: 60
+  clip_grad_norm: 1.0
+  amp: true
+  train_frac: 0.7
+  val_frac: 0.15
+phenotypes:
+  continuous:
+  - IST_intelligence_total
+  - IST_fluid
+  - IST_crystallised
+  - IST_memory
+  - NEO_N
+  - NEO_E
+  - NEO_O
+  - NEO_A
+  - NEO_C
+  - BIS
+  - BAS_drive
+  - BAS_fun
+  - BAS_reward
+  - STAI_T
+  - age
+  - BMI
+  categorical:
+  - sex
+  - handedness
+  - education_level
+contrastive:
+  enabled: true
+  temperature: 0.5
+  weight: 0.5
+  proj_dim: 128
+  aug_edge_drop: 0.1
+  aug_feat_noise: 0.02
+disentanglement:
+  dip_enabled: true
+  dip_lambda_od: 10.0
+  dip_lambda_d: 0.1
+  dip_weight: 0.001
+analysis:
+  n_clusters:
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  fingerprint_metric: cosine
+  n_permutations: 5000
+  n_bootstrap: 200
+  fdr_alpha: 0.05
+export:
+  figure_formats:
+  - pdf
+  - png
+  - svg
+  save_csv: true
+  save_npz: true
+visualization:
+  dpi: 300
+  format: pdf
+  figure_width_single: 3.5
+  figure_width_double: 7.0
+  umap_n_neighbors: 15
+  umap_min_dist: 0.1
+  network_colors:
+    Vis: '#e6194b'
+    VisCent: '#e6194b'
+    VisPeri: '#f58231'
+    SomMot: '#ffe119'
+    DorsAttn: '#3cb44b'
+    SalVentAttn: '#42d4f4'
+    Limbic: '#4363d8'
+    Cont: '#911eb4'
+    Default: '#f032e6'
