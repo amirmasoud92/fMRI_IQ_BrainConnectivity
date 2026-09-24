@@ -134,3 +134,8 @@ reason.
 
 The hold-out set was sealed once; `seal_holdout.py` reproduces the split from its recorded seed and
 manifest, and `evaluate_holdout.py` refuses to run against a manifest whose hash does not match.
+
+## License
+
+The code in this repository is released under the MIT License; see [LICENSE](LICENSE). The AOMIC
+collections it analyses are distributed by OpenNeuro under their own terms.
